@@ -11,10 +11,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 #Classification Dataset
-df_reg = pd.read_csv("data/phpV5QYya.csv")
+df_cla = pd.read_csv("data/phpV5QYya.csv")
 
 #Barplot Predictor variable
-sns.countplot(x="Result", data=df_reg)
+sns.countplot(x="Result", data=df_cla)
 
 
 #Regression Dataset
@@ -54,7 +54,7 @@ plt.bar(new_df["Date"], new_df["NoVisitors"], color ='blue',
 
 plt.xlabel("Dates")
 plt.ylabel("No of Visitors in Million Clicks")
-plt.title("No of Visitors on Math Wikipedia Pages per day")
+#plt.title("No of Visitors on all Math Wikipedia Pages per day")
 
 x=list(range(0, 744, 31))
 values = ['March','April','May','June','July','August','September','October','November','December','January','February','March','April','May','June','July','August','September','October','November','December','January','February']
@@ -65,7 +65,9 @@ plt.xticks(x,values,rotation=90)
 #yvalues= ['0','200000','400000','600000','800000','1000000','1200000','1400000']
 
 #plt.yticks(y, yvalues)
-plt.show()
+#plt.show()
+
+plt.savefig("barplot_novisitors_per_date.png")
 
 #print(len(d_subset["0"]["y"]))
 
