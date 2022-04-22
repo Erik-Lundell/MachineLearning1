@@ -61,7 +61,7 @@ from sklearn.ensemble import RandomForestClassifier
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, random_state = 21)
 
 ###########  Random Forest Classification ##############
-rf_classifier = RandomForestClassifier(n_estimators = 1000, criterion = 'entropy', random_state = 42)
+rf_classifier = RandomForestClassifier(n_estimators = 200, criterion = 'entropy', random_state = 42)
 rf_classifier.fit(X_train, y_train)
 
 # Predicting the Test set results
@@ -79,7 +79,9 @@ df = pd.DataFrame(test_kaggle_pred, d_test["ID"])
 df.columns = ["class"]
 df.to_csv('./data/output_df.csv')
 
-# Feature Importance
+
+
+'''# Feature Importance
 feature_names = d_train.drop(["ID","class"], axis=1).columns.tolist()
 importances = rf_classifier.feature_importances_
 ## Put in a pandas dtf
@@ -107,7 +109,9 @@ plt.show()
 
 # Reducing Number of features
 
-variable_subset = dtf_importances[dtf_importances["IMPORTANCE"]>0.005]
+print(len(dtf_importances))
+variable_subset = dtf_importances[dtf_importances["IMPORTANCE"]>0.002]
+print(len(variable_subset))
 
 X_names = variable_subset.index.tolist()
 X_reduced = d_train[X_names].values
@@ -115,8 +119,10 @@ X_reduced = d_train[X_names].values
 X_train_reduced, X_test_reduced, y_train_reduced, y_test_reduced = train_test_split(X_reduced, y, test_size = 0.20, random_state = 21)
 
 # Random Forest Classification
-rf_classifier = RandomForestClassifier(n_estimators = 1000, criterion = 'entropy', random_state = 42)
+rf_classifier = RandomForestClassifier(n_estimators = 200, criterion = 'entropy', random_state = 42)
 rf_classifier.fit(X_train_reduced, y_train_reduced)
+
+
 
 # Predicting the Test set results
 y_pred_reduced = rf_classifier.predict(X_test_reduced)
@@ -125,4 +131,45 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 
 #print(confusion_matrix(y_test_reduced,y_pred_reduced))
 print(classification_report(y_test_reduced,y_pred_reduced))
-print(accuracy_score(y_test_reduced, y_pred_reduced))
+print(accuracy_score(y_test_reduced, y_pred_reduced))'''
+
+
+
+###### lightgbm #############
+# Try Gradient Boosting (lightgbm)
+
+import lightgbm as lgb
+
+#clf = lgb.LGBMClassifier().fit(X_train, y_train)
+
+#y_pred = clf.predict(X_test)
+
+#from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
+#print(confusion_matrix(y_test,y_pred))
+print(classification_report(y_test,y_pred))
+print(accuracy_score(y_test, y_pred))
+
+###### LDA #############
+
+
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+
+lda = LDA()
+lda_object = lda.fit(X_train, y_train)
+X_lda = lda_object.transform(X_train)
+
+y_pred = lda.predict(X_test)
+
+lda = LDA()
+lda_object= lda.fit(X,y)
+
+test_kaggle_pred = lda_object.predict(X_kaggle_test)
+
+df = pd.DataFrame(test_kaggle_pred, d_test["ID"])
+df.columns = ["class"]
+df.to_csv('./data/output_df.csv')
+
+print(classification_report(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+
