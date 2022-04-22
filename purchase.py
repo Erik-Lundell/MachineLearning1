@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 #from sklearn.externals import joblib
 
 #d_train = pd.read_csv("H:/Markus/purchase_ds/purchase600-100cls-15k.lrn.csv")
@@ -61,13 +62,13 @@ from sklearn.ensemble import RandomForestClassifier
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, random_state = 21)
 
 ###########  Random Forest Classification ##############
-rf_classifier = RandomForestClassifier(n_estimators = 200, criterion = 'entropy', random_state = 42)
+'''rf_classifier = RandomForestClassifier(n_estimators = 200, criterion = 'entropy', random_state = 42)
 rf_classifier.fit(X_train, y_train)
 
 # Predicting the Test set results
 y_pred = rf_classifier.predict(X_test)
 
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
 
 #print(confusion_matrix(y_test,y_pred))
 print(classification_report(y_test,y_pred))
@@ -77,7 +78,7 @@ test_kaggle_pred = rf_classifier.predict(X_kaggle_test)
 
 df = pd.DataFrame(test_kaggle_pred, d_test["ID"])
 df.columns = ["class"]
-df.to_csv('./data/output_df.csv')
+df.to_csv('./data/output_df.csv')'''
 
 
 
@@ -140,6 +141,8 @@ print(accuracy_score(y_test_reduced, y_pred_reduced))'''
 
 import lightgbm as lgb
 
+
+
 #clf = lgb.LGBMClassifier().fit(X_train, y_train)
 
 #y_pred = clf.predict(X_test)
@@ -147,13 +150,13 @@ import lightgbm as lgb
 #from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
 #print(confusion_matrix(y_test,y_pred))
-print(classification_report(y_test,y_pred))
-print(accuracy_score(y_test, y_pred))
+#print(classification_report(y_test,y_pred))
+#print(accuracy_score(y_test, y_pred))
 
 ###### LDA #############
 
 
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+'''from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 
 lda = LDA()
 lda_object = lda.fit(X_train, y_train)
@@ -161,15 +164,162 @@ X_lda = lda_object.transform(X_train)
 
 y_pred = lda.predict(X_test)
 
-lda = LDA()
-lda_object= lda.fit(X,y)
 
-test_kaggle_pred = lda_object.predict(X_kaggle_test)
+
+print(classification_report(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+
+###### QDA #############
+
+
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis as QDA
+
+qda = QDA()
+qda = qda.fit(X_train, y_train)
+
+
+y_pred = qda.predict(X_test)
+
+
+print(classification_report(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+
+
+###### SVM #############
+
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+
+clf = make_pipeline(StandardScaler(), SVC(gamma='auto'))
+clf.fit(X_train, y_train)
+
+
+y_pred = clf.predict(X_test)
+
+
+print(classification_report(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))'''
+
+
+###### Logistic Regression #############
+
+
+from sklearn.linear_model import LogisticRegression
+clf = LogisticRegression(random_state=0)
+clf.fit(X_train, y_train)
+
+
+y_pred = clf.predict(X_test)
+
+
+print(classification_report(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+
+
+###### Logistic Regression with pca #############
+
+
+from sklearn.decomposition import PCA
+# Make an instance of the Model
+pca = PCA(n_components=11)
+
+
+pca.fit(X_train)
+
+train_pca = pca.transform(X_train)
+test_pca = pca.transform(X_test)
+
+print(pca.explained_variance_ratio_)
+
+
+clf = LogisticRegression(random_state=0)
+clf.fit(train_pca, y_train)
+
+
+y_pred = clf.predict(test_pca)
+
+
+print(classification_report(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+
+###### Ridgle Classifier #############
+
+
+# SUXX
+
+
+'''from sklearn.linear_model import RidgeClassifier
+clf = RidgeClassifier()
+
+clf.fit(X_train, y_train)
+
+y_pred = clf.predict(X_test)
+
+print(classification_report(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))'''
+
+###### Ridgle Classifier #############
+
+
+# SUXX
+
+
+'''from sklearn.naive_bayes import GaussianNB
+clf = GaussianNB()
+
+clf.fit(X_train, y_train)
+
+y_pred = clf.predict(X_test)
+
+print(classification_report(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))'''
+
+
+###### TPot #######
+
+
+# check tpot version
+'''import tpot
+from sklearn.model_selection import RepeatedStratifiedKFold
+
+# define model evaluation
+cv = RepeatedStratifiedKFold(n_splits=5, n_repeats=1, random_state=42)
+model = tpot.TPOTClassifier(generations=3, population_size=20, cv=cv, scoring='accuracy', 
+                            verbosity=2, random_state=42, n_jobs=-1)
+
+model.fit(X, y)'''
+
+
+#### Submission 
+
+from sklearn.decomposition import PCA
+# Make an instance of the Model
+pca = PCA(n_components=11)
+
+
+pca.fit(X)
+
+train_pca = pca.transform(X)
+
+print(pca.explained_variance_ratio_)
+
+
+clf = LogisticRegression(random_state=0)
+clf.fit(train_pca, y)
+
+test_pca = pca.transform(X_kaggle_test)
+y_pred = clf.predict(test_pca)
+
+
+
+test_kaggle_pred = clf.predict(test_pca)
 
 df = pd.DataFrame(test_kaggle_pred, d_test["ID"])
 df.columns = ["class"]
 df.to_csv('./data/output_df.csv')
 
-print(classification_report(y_test, y_pred))
-print(confusion_matrix(y_test, y_pred))
+
+
+
 
