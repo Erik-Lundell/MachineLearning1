@@ -17,6 +17,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import cross_val_score
 
 df=pd.read_csv("breast-cancer-diagnostic.shuf.lrn.csv")
+holdout=pd.read_csv("breast-cancer-diagnostic.shuf.tes.csv")
 
 train, test = train_test_split(df, test_size=0.2, random_state=42, stratify=df[['class']])
 
@@ -24,32 +25,32 @@ print("------- KNN ---------")
 
 
 neigh = KNeighborsClassifier(n_neighbors=3)
-neigh.fit(train.drop("class",axis=1), train["class"])
+neigh.fit(train.drop(["class","ID"],axis=1), train["class"])
 
-proba=neigh.predict_proba(test.drop("class",axis=1))[:, 1]
-pred=neigh.predict(test.drop("class",axis=1))
+proba=neigh.predict_proba(test.drop(["class","ID"],axis=1))[:, 1]
+pred=neigh.predict(test.drop(["class","ID"],axis=1))
 
 print(roc_auc_score(test["class"], proba))
 print("rechts prediction")
 print(confusion_matrix(test["class"], pred))
-print(cross_val_score(neigh, df.drop("class",axis=1), df["class"], scoring="roc_auc", cv = 5))
-print(sum(cross_val_score(neigh, df.drop("class",axis=1), df["class"], scoring="roc_auc", cv = 5))/5)
+print(cross_val_score(neigh, df.drop(["class","ID"],axis=1), df["class"], scoring="roc_auc", cv = 5))
+print(sum(cross_val_score(neigh, df.drop(["class","ID"],axis=1), df["class"], scoring="roc_auc", cv = 5))/5)
 
 print("------- LDA ---------")
 
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 lda = LinearDiscriminantAnalysis()
 #lda.fit(X, y)
-lda.fit(train.drop("class",axis=1), train["class"])
+lda.fit(train.drop(["class","ID"],axis=1), train["class"])
 
-proba=lda.predict_proba(test.drop("class",axis=1))[:, 1]
-pred=lda.predict(test.drop("class",axis=1))
+proba=lda.predict_proba(test.drop(["class","ID"],axis=1))[:, 1]
+pred=lda.predict(test.drop(["class","ID"],axis=1))
 
 print(roc_auc_score(test["class"], proba))
 print("rechts prediction")
 print(confusion_matrix(test["class"], pred))
-print(cross_val_score(lda, df.drop("class",axis=1), df["class"], scoring="roc_auc", cv = 5))
-print(sum(cross_val_score(lda, df.drop("class",axis=1), df["class"], scoring="roc_auc", cv = 5))/5)
+print(cross_val_score(lda, df.drop(["class","ID"],axis=1), df["class"], scoring="roc_auc", cv = 5))
+print(sum(cross_val_score(lda, df.drop(["class","ID"],axis=1), df["class"], scoring="roc_auc", cv = 5))/5)
 
 
 print("------- RFC ---------")
@@ -57,20 +58,27 @@ print("------- RFC ---------")
 from sklearn.ensemble import RandomForestClassifier
 rfc = RandomForestClassifier(max_depth=2, random_state=0)
 
-rfc.fit(train.drop("class",axis=1), train["class"])
+rfc.fit(train.drop(["class","ID"],axis=1), train["class"])
 
-proba=rfc.predict_proba(test.drop("class",axis=1))[:, 1]
-pred=rfc.predict(test.drop("class",axis=1))
+proba=rfc.predict_proba(test.drop(["class","ID"],axis=1))[:, 1]
+pred=rfc.predict(test.drop(["class","ID"],axis=1))
 
 print(roc_auc_score(test["class"], proba))
 print("rechts prediction")
 print(confusion_matrix(test["class"], pred))
-print(cross_val_score(rfc, df.drop("class",axis=1), df["class"], scoring="roc_auc", cv = 5))
-print(sum(cross_val_score(rfc, df.drop("class",axis=1), df["class"], scoring="roc_auc", cv = 5))/5)
+print(cross_val_score(rfc, df.drop(["class","ID"],axis=1), df["class"], scoring="roc_auc", cv = 5))
+print(sum(cross_val_score(rfc, df.drop(["class","ID"],axis=1), df["class"], scoring="roc_auc", cv = 5))/5)
 
 
 
 
+rfc.fit(df.drop(["class","ID"],axis=1), df["class"])
+holdout_pred=rfc.predict(holdout.drop(["ID"],axis=1))
+
+prediction=pd.concat([holdout["ID"],pd.Series(holdout_pred)],axis=1)
+prediction.columns=["ID","class"]
+
+prediction.to_csv("test.csv",index=False)
 
 
 #roc_auc_score(y, clf.predict_proba(X)[:, 1])
